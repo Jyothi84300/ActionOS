@@ -21,6 +21,14 @@ def _utcnow() -> datetime.datetime:
     return datetime.datetime.now(datetime.timezone.utc)
 
 
+def _coerce_datetime(value: Optional[datetime.datetime]) -> Optional[datetime.datetime]:
+    if value is None or isinstance(value, datetime.datetime):
+        return value
+    if isinstance(value, str):
+        return datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return value
+
+
 def create_goal(
     db: Session,
     user_id: UUID,
@@ -38,7 +46,7 @@ def create_goal(
         title=title,
         description=description,
         objective=objective,
-        deadline=deadline,
+        deadline=_coerce_datetime(deadline),
         priority=priority,
         category=category,
         constraints=constraints,
